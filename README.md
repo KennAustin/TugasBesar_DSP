@@ -2,6 +2,5 @@ Ini adalah repository TugasBesar_DSP untuk mengerjakan tugas akhir matakuliah Di
 
 Nama mahasiswa :
 
-Kenneth Austin Wijaya - 122140043
-
+Kenneth Austin Wijaya - 122140043  
 Festus Mikhael - 122140087
