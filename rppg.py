@@ -1,10 +1,12 @@
+# rppg.py
+
 import cv2
 import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 import numpy as np
 
-# Inisialisasi dan muat model deteksi wajah dari MediaPipe (sekali saja)
+# Inisialisasi dan muat model deteksi wajah dari MediaPipe
 base_model = "models/blaze_face_short_range.tflite"
 base_options = python.BaseOptions(model_asset_path=base_model)
 FaceDetectorOptions = vision.FaceDetectorOptions
@@ -13,7 +15,7 @@ VisionRunningMode = vision.RunningMode
 # Konfigurasi detektor wajah
 options = FaceDetectorOptions(
     base_options=base_options,
-    running_mode=VisionRunningMode.IMAGE,  # Mode IMAGE cocok untuk input frame statis
+    running_mode=VisionRunningMode.IMAGE  # Mode IMAGE cocok untuk input frame statis
 )
 
 # Buat objek detektor wajah
@@ -29,13 +31,12 @@ def rppg_process(rgb_frame, frame):
     dari ROI (bagian wajah) sebagai sinyal rPPG.
 
     Args:
-        rgb_frame (numpy.ndarray): Frame dalam format RGB.
-        frame (numpy.ndarray): Frame asli (BGR) untuk menampilkan anotasi (bounding box).
+        rgb_frame (np.ndarray): Frame dalam format RGB.
+        frame (np.ndarray): Frame asli (BGR) untuk menampilkan anotasi (bounding box).
 
     Returns:
-        mean_rgb (tuple(float, float, float) | None):
-            Tuple nilai rata-rata (R, G, B) pada ROI wajah, atau None jika tidak ada wajah.
-        frame (numpy.ndarray): Frame dengan kotak deteksi wajah (untuk ditampilkan).
+        tuple or None: Tuple nilai rata-rata (R, G, B) pada ROI wajah, atau None jika tidak ada wajah.
+        np.ndarray: Frame dengan kotak deteksi wajah (untuk ditampilkan).
     """
 
     # Konversi numpy array menjadi MediaPipe Image
@@ -50,7 +51,7 @@ def rppg_process(rgb_frame, frame):
     # Jika terdeteksi minimal satu wajah
     if result.detections:
         for detection in result.detections:
-            bboxC = detection.bounding_box  # Ambil koordinat bounding box
+            bboxC = detection.bounding_box
             x, y, w, h = bboxC.origin_x, bboxC.origin_y, bboxC.width, bboxC.height
 
             # Hitung ulang posisi dan ukuran ROI dengan margin dan scaling
@@ -75,10 +76,16 @@ def rppg_process(rgb_frame, frame):
             # Hitung nilai rata-rata RGB di ROI
             mean_rgb = cv2.mean(face_roi)[:3]
 
-            # Gambar bounding box pada frame output (dalam warna hijau)
-            cv2.rectangle(frame, (int(new_x), int(new_y)), (int(new_x + new_w), int(new_y + new_h)), (0, 255, 0), 2)
+            # Gambar bounding box pada frame output
+            cv2.rectangle(
+                frame,
+                (int(new_x), int(new_y)),
+                (int(new_x + new_w), int(new_y + new_h)),
+                (0, 255, 0),
+                2
+            )
 
-            return mean_rgb, frame  # Return mean RGB dan frame dengan bounding box
+            return mean_rgb, frame
 
     # Jika tidak ada wajah terdeteksi, kembalikan None dan frame asli
     return None, frame

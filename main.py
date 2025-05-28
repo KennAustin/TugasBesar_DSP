@@ -6,7 +6,7 @@ import time
 import matplotlib.pyplot as plt
 
 from rppg import rppg_process
-from respiration import respiration_process
+from Respiration import respiration_process
 
 class RPPGApp:
     """
